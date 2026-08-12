@@ -249,12 +249,12 @@ body.dark-theme {
 }
 
 .view-panel {
-  display: none !important;
+  display: none;
   animation: fadeIn 0.3s ease;
 }
 
 .view-panel.active {
-  display: block !important;
+  display: block;
 }
 
 @keyframes fadeIn {
@@ -1521,7 +1521,7 @@ body.dark-theme {
    AUTHENTICATION & LOGIN VIEW STYLING
    ========================================================================== */
 #login-view {
-  display: none !important;
+  display: none;
   min-height: calc(100vh - 140px);
   align-items: center;
   justify-content: center;
@@ -1529,7 +1529,7 @@ body.dark-theme {
 }
 
 #login-view.active {
-  display: flex !important;
+  display: flex;
 }
 
 .login-container {

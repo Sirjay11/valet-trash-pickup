@@ -204,6 +204,7 @@ class ValetFlowApp {
   }
 
   loginAsAdmin(email = "admin@valetflow.com") {
+    console.log("[AUTH] loginAsAdmin called");
     const user = {
       role: "admin",
       name: "James Doe",
@@ -213,10 +214,10 @@ class ValetFlowApp {
     };
     this.saveUserSession(user);
     this.applyUserSession();
-    this.switchViewPanel("admin-view");
   }
 
   loginAsPorter(porterId = "porter-1") {
+    console.log("[AUTH] loginAsPorter called with", porterId);
     const porter = this.data.porters.find(p => p.id === porterId) || this.data.porters[0];
     const initials = porter.name.split(' ').map(n => n[0]).join('');
     const user = {
@@ -229,13 +230,12 @@ class ValetFlowApp {
     };
     this.saveUserSession(user);
     this.applyUserSession();
-    this.switchViewPanel("porter-view");
   }
 
   logout() {
+    console.log("[AUTH] logout called");
     this.saveUserSession(null);
     this.applyUserSession();
-    this.switchViewPanel("login-view");
   }
 
   applyUserSession() {
@@ -274,12 +274,19 @@ class ValetFlowApp {
   }
 
   switchViewPanel(viewId) {
-    document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
+    console.log("[VIEW] switchViewPanel ->", viewId);
+    const allPanels = document.querySelectorAll(".view-panel");
+    allPanels.forEach(p => {
+      p.classList.remove("active");
+      p.style.display = "none";
+    });
     const target = document.getElementById(viewId);
     if (target) {
       target.classList.add("active");
+      target.style.display = "";
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+    console.log("[VIEW] Active panels:", [...document.querySelectorAll(".view-panel.active")].map(p => p.id));
 
     const roleBtns = document.querySelectorAll(".role-btn");
     roleBtns.forEach(btn => {

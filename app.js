@@ -276,7 +276,10 @@ class ValetFlowApp {
   switchViewPanel(viewId) {
     document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
     const target = document.getElementById(viewId);
-    if (target) target.classList.add("active");
+    if (target) {
+      target.classList.add("active");
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
     const roleBtns = document.querySelectorAll(".role-btn");
     roleBtns.forEach(btn => {

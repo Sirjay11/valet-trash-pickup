@@ -160,6 +160,35 @@ const INITIAL_DATA = {
   ]
 };
 
+// ==========================================================================
+// AUTHENTICATION CREDENTIALS STORE
+// In production, this would be validated server-side. For now, client-side
+// credentials allow full app testing without a backend.
+// ==========================================================================
+const AUTH_CREDENTIALS = {
+  admins: [
+    {
+      email: "admin@valetflow.com",
+      password: "admin123",
+      name: "James Doe",
+      title: "Operations Director",
+      avatar: "JD"
+    },
+    {
+      email: "owner@valetflow.com",
+      password: "owner123",
+      name: "Lisa Park",
+      title: "Property Owner",
+      avatar: "LP"
+    }
+  ],
+  porterPins: {
+    "porter-1": "1234",   // Marcus Vance
+    "porter-2": "5678",   // Sarah Jenkins
+    "porter-3": "9012"    // Devon Carter
+  }
+};
+
 // GLOBAL APP CONTROLLER STATE
 class ValetFlowApp {
   constructor() {
@@ -203,23 +232,87 @@ class ValetFlowApp {
     }
   }
 
-  loginAsAdmin(email = "admin@valetflow.com") {
-    console.log("[AUTH] loginAsAdmin called");
+  // ==========================================
+  // AUTHENTICATION WITH REAL CREDENTIAL VALIDATION
+  // ==========================================
+  showLoginError(message) {
+    const banner = document.getElementById("login-error-msg");
+    const text = document.getElementById("login-error-text");
+    if (banner && text) {
+      text.textContent = message;
+      banner.style.display = "flex";
+      banner.classList.remove("shake");
+      void banner.offsetWidth; // force reflow for re-triggering animation
+      banner.classList.add("shake");
+    }
+  }
+
+  hideLoginError() {
+    const banner = document.getElementById("login-error-msg");
+    if (banner) banner.style.display = "none";
+  }
+
+  validateAdminLogin() {
+    const email = document.getElementById("admin-email")?.value.trim().toLowerCase();
+    const password = document.getElementById("admin-password")?.value;
+
+    if (!email || !password) {
+      this.showLoginError("Please enter both email and password.");
+      return;
+    }
+
+    const match = AUTH_CREDENTIALS.admins.find(
+      a => a.email.toLowerCase() === email && a.password === password
+    );
+
+    if (!match) {
+      this.showLoginError("Invalid email or password. Check your credentials.");
+      return;
+    }
+
+    // SUCCESS — Create admin session
+    console.log("[AUTH] Admin login SUCCESS:", match.name);
+    this.hideLoginError();
     const user = {
       role: "admin",
-      name: "James Doe",
-      title: "Operations Director",
-      avatar: "JD",
-      email: email
+      name: match.name,
+      title: match.title,
+      avatar: match.avatar,
+      email: match.email
     };
     this.saveUserSession(user);
     this.applyUserSession();
   }
 
-  loginAsPorter(porterId = "porter-1") {
-    console.log("[AUTH] loginAsPorter called with", porterId);
+  validatePorterLogin() {
+    const porterSelect = document.getElementById("porter-select-login");
+    const pinInput = document.getElementById("porter-pin");
+    const porterId = porterSelect?.value;
+    const pin = pinInput?.value.trim();
+
+    if (!porterId) {
+      this.showLoginError("Please select your name from the list.");
+      return;
+    }
+
+    if (!pin || pin.length !== 4) {
+      this.showLoginError("Please enter your 4-digit field PIN.");
+      return;
+    }
+
+    const correctPin = AUTH_CREDENTIALS.porterPins[porterId];
+    if (pin !== correctPin) {
+      this.showLoginError("Incorrect PIN. Please try again.");
+      pinInput.value = "";
+      pinInput.focus();
+      return;
+    }
+
+    // SUCCESS — Create porter session
     const porter = this.data.porters.find(p => p.id === porterId) || this.data.porters[0];
     const initials = porter.name.split(' ').map(n => n[0]).join('');
+    console.log("[AUTH] Porter login SUCCESS:", porter.name);
+    this.hideLoginError();
     const user = {
       role: "porter",
       name: porter.name,
@@ -235,6 +328,16 @@ class ValetFlowApp {
   logout() {
     console.log("[AUTH] logout called");
     this.saveUserSession(null);
+    this.hideLoginError();
+    // Clear form inputs for security
+    const adminEmail = document.getElementById("admin-email");
+    const adminPw = document.getElementById("admin-password");
+    const porterPin = document.getElementById("porter-pin");
+    const porterSelect = document.getElementById("porter-select-login");
+    if (adminEmail) adminEmail.value = "";
+    if (adminPw) adminPw.value = "";
+    if (porterPin) porterPin.value = "";
+    if (porterSelect) porterSelect.selectedIndex = 0;
     this.applyUserSession();
   }
 
@@ -341,12 +444,13 @@ class ValetFlowApp {
   }
 
   initEventListeners() {
-    // AUTHENTICATION TAB SWITCHES ON LOGIN VIEW
+    // ====== AUTHENTICATION TAB SWITCHES ======
     document.getElementById("tab-btn-admin")?.addEventListener("click", () => {
       document.getElementById("tab-btn-admin").classList.add("active");
       document.getElementById("tab-btn-porter").classList.remove("active");
       document.getElementById("form-admin-login").classList.add("active");
       document.getElementById("form-porter-login").classList.remove("active");
+      this.hideLoginError();
     });
 
     document.getElementById("tab-btn-porter")?.addEventListener("click", () => {
@@ -354,38 +458,86 @@ class ValetFlowApp {
       document.getElementById("tab-btn-admin").classList.remove("active");
       document.getElementById("form-porter-login").classList.add("active");
       document.getElementById("form-admin-login").classList.remove("active");
+      this.hideLoginError();
     });
 
-    // ADMIN LOGIN BUTTON CLICK
+    // ====== LOGIN SUBMIT BUTTONS ======
     document.getElementById("btn-submit-admin-login")?.addEventListener("click", () => {
-      const email = document.getElementById("admin-email")?.value || "admin@valetflow.com";
-      this.loginAsAdmin(email);
+      this.validateAdminLogin();
     });
 
-    // PORTER LOGIN BUTTON CLICK
     document.getElementById("btn-submit-porter-login")?.addEventListener("click", () => {
-      const porterId = document.getElementById("porter-select-login")?.value || "porter-1";
-      this.loginAsPorter(porterId);
+      this.validatePorterLogin();
     });
 
-    // AUTO-FILL DEMO BUTTONS
+    // ====== ENTER KEY SUPPORT ======
+    document.getElementById("admin-password")?.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") this.validateAdminLogin();
+    });
+    document.getElementById("admin-email")?.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") this.validateAdminLogin();
+    });
+    document.getElementById("porter-pin")?.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") this.validatePorterLogin();
+    });
+
+    // ====== PASSWORD VISIBILITY TOGGLES ======
+    document.getElementById("btn-toggle-admin-pw")?.addEventListener("click", () => {
+      const input = document.getElementById("admin-password");
+      const icon = document.querySelector("#btn-toggle-admin-pw i");
+      if (input.type === "password") {
+        input.type = "text";
+        if (icon) icon.setAttribute("data-lucide", "eye-off");
+      } else {
+        input.type = "password";
+        if (icon) icon.setAttribute("data-lucide", "eye");
+      }
+      if (window.lucide) window.lucide.createIcons();
+    });
+
+    document.getElementById("btn-toggle-porter-pw")?.addEventListener("click", () => {
+      const input = document.getElementById("porter-pin");
+      const icon = document.querySelector("#btn-toggle-porter-pw i");
+      if (input.type === "password") {
+        input.type = "text";
+        if (icon) icon.setAttribute("data-lucide", "eye-off");
+      } else {
+        input.type = "password";
+        if (icon) icon.setAttribute("data-lucide", "eye");
+      }
+      if (window.lucide) window.lucide.createIcons();
+    });
+
+    // ====== TEST CREDENTIAL PANEL TOGGLES ======
+    document.getElementById("btn-toggle-admin-creds")?.addEventListener("click", () => {
+      const body = document.getElementById("admin-creds-body");
+      if (body) body.style.display = body.style.display === "none" ? "flex" : "none";
+    });
+
+    document.getElementById("btn-toggle-porter-creds")?.addEventListener("click", () => {
+      const body = document.getElementById("porter-creds-body");
+      if (body) body.style.display = body.style.display === "none" ? "flex" : "none";
+    });
+
+    // ====== AUTO-FILL & SIGN IN BUTTONS ======
     document.getElementById("btn-quick-fill-admin")?.addEventListener("click", () => {
       document.getElementById("admin-email").value = "admin@valetflow.com";
       document.getElementById("admin-password").value = "admin123";
-      this.loginAsAdmin("admin@valetflow.com");
+      this.validateAdminLogin();
     });
 
     document.getElementById("btn-quick-fill-porter")?.addEventListener("click", () => {
       document.getElementById("porter-select-login").value = "porter-1";
-      this.loginAsPorter("porter-1");
+      document.getElementById("porter-pin").value = "1234";
+      this.validatePorterLogin();
     });
 
-    // LOG OUT BUTTON
+    // ====== LOG OUT BUTTON ======
     document.getElementById("btn-logout")?.addEventListener("click", () => {
       this.logout();
     });
 
-    // LIVE SHIFT MODE RESET & DEMO RESET
+    // ====== LIVE SHIFT MODE RESET & DEMO RESET ======
     document.getElementById("btn-reset-demo")?.addEventListener("click", () => {
       this.resetDemo();
     });

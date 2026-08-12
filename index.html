@@ -95,59 +95,114 @@
           <!-- AUTH PORTAL TABS -->
           <div class="auth-tabs">
             <button class="auth-tab-btn active" id="tab-btn-admin">
-              <i data-lucide="layout-dashboard"></i> Admin / Owner Login
+              <i data-lucide="layout-dashboard"></i> Admin / Owner
             </button>
             <button class="auth-tab-btn" id="tab-btn-porter">
-              <i data-lucide="smartphone"></i> Field Porter App
+              <i data-lucide="smartphone"></i> Field Porter
             </button>
+          </div>
+
+          <!-- LOGIN ERROR MESSAGE -->
+          <div id="login-error-msg" class="login-error-banner" style="display:none;">
+            <i data-lucide="alert-triangle"></i>
+            <span id="login-error-text">Invalid credentials</span>
           </div>
 
           <!-- ADMIN LOGIN FORM -->
           <div id="form-admin-login" class="auth-form active">
             <div class="form-group">
               <label><i data-lucide="mail"></i> Email Address</label>
-              <input type="email" id="admin-email" value="admin@valetflow.com" placeholder="admin@valetflow.com">
+              <input type="email" id="admin-email" placeholder="Enter your email" autocomplete="email">
             </div>
             <div class="form-group">
               <label><i data-lucide="key"></i> Password</label>
-              <input type="password" id="admin-password" value="admin123" placeholder="••••••••">
+              <div class="input-password-wrap">
+                <input type="password" id="admin-password" placeholder="Enter password" autocomplete="current-password">
+                <button type="button" class="btn-toggle-pw" id="btn-toggle-admin-pw" title="Show password">
+                  <i data-lucide="eye"></i>
+                </button>
+              </div>
             </div>
             <div class="form-actions-stack">
               <button type="button" class="btn-primary btn-block" id="btn-submit-admin-login">
-                <i data-lucide="log-in"></i> Log In as Operations Director
+                <i data-lucide="log-in"></i> Sign In
               </button>
-              <button type="button" class="btn-secondary btn-block btn-sm" id="btn-quick-fill-admin">
-                <i data-lucide="sparkles"></i> Auto-Fill Demo Admin Credentials
+            </div>
+
+            <!-- TEST CREDENTIALS HELPER -->
+            <div class="test-creds-panel">
+              <button type="button" class="btn-show-test-creds" id="btn-toggle-admin-creds">
+                <i data-lucide="info"></i> Show Test Credentials
               </button>
+              <div class="test-creds-body" id="admin-creds-body" style="display:none;">
+                <div class="cred-row">
+                  <span class="cred-label">Email</span>
+                  <code class="cred-value">admin@valetflow.com</code>
+                </div>
+                <div class="cred-row">
+                  <span class="cred-label">Password</span>
+                  <code class="cred-value">admin123</code>
+                </div>
+                <button type="button" class="btn-autofill-creds" id="btn-quick-fill-admin">
+                  <i data-lucide="zap"></i> Auto-Fill & Sign In
+                </button>
+              </div>
             </div>
           </div>
 
           <!-- PORTER LOGIN FORM -->
           <div id="form-porter-login" class="auth-form">
             <div class="form-group">
-              <label><i data-lucide="user"></i> Select Active Porter</label>
+              <label><i data-lucide="user"></i> Select Your Name</label>
               <select id="porter-select-login">
-                <option value="porter-1">Marcus Vance — Oakridge Luxury Apartments</option>
+                <option value="" disabled selected>— Select Porter —</option>
+                <option value="porter-1">Marcus Vance — Oakridge Luxury</option>
                 <option value="porter-2">Sarah Jenkins — The Grand Reserve</option>
                 <option value="porter-3">Devon Carter — Sunburst Ridge</option>
               </select>
             </div>
             <div class="form-group">
-              <label><i data-lucide="lock"></i> Porter Field Access PIN</label>
-              <input type="password" id="porter-pin" value="4920" placeholder="Enter 4-digit PIN">
+              <label><i data-lucide="lock"></i> 4-Digit Field PIN</label>
+              <div class="input-password-wrap">
+                <input type="password" id="porter-pin" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                <button type="button" class="btn-toggle-pw" id="btn-toggle-porter-pw" title="Show PIN">
+                  <i data-lucide="eye"></i>
+                </button>
+              </div>
             </div>
             <div class="form-actions-stack">
               <button type="button" class="btn-primary btn-block bg-emerald" id="btn-submit-porter-login">
-                <i data-lucide="smartphone"></i> Start Field Shift (Porter App)
+                <i data-lucide="smartphone"></i> Clock In & Start Shift
               </button>
-              <button type="button" class="btn-secondary btn-block btn-sm" id="btn-quick-fill-porter">
-                <i data-lucide="sparkles"></i> Auto-Fill Demo Porter (Marcus)
+            </div>
+
+            <!-- TEST CREDENTIALS HELPER -->
+            <div class="test-creds-panel">
+              <button type="button" class="btn-show-test-creds" id="btn-toggle-porter-creds">
+                <i data-lucide="info"></i> Show Test PINs
               </button>
+              <div class="test-creds-body" id="porter-creds-body" style="display:none;">
+                <div class="cred-row">
+                  <span class="cred-label">Marcus Vance</span>
+                  <code class="cred-value">1234</code>
+                </div>
+                <div class="cred-row">
+                  <span class="cred-label">Sarah Jenkins</span>
+                  <code class="cred-value">5678</code>
+                </div>
+                <div class="cred-row">
+                  <span class="cred-label">Devon Carter</span>
+                  <code class="cred-value">9012</code>
+                </div>
+                <button type="button" class="btn-autofill-creds" id="btn-quick-fill-porter">
+                  <i data-lucide="zap"></i> Auto-Fill Marcus & Sign In
+                </button>
+              </div>
             </div>
           </div>
 
           <div class="login-footer-info">
-            <i data-lucide="shield-check"></i> Field-Ready GPS Geofenced Operations • Encrypted Session
+            <i data-lucide="shield-check"></i> Encrypted Session • Role-Based Access Control
           </div>
         </div>
       </div>

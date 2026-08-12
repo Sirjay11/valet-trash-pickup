@@ -295,7 +295,7 @@ class ValetFlowApp {
     this.data = JSON.parse(JSON.stringify(INITIAL_DATA));
     this.saveState();
     this.renderAll();
-    alert("🔄 Demo Data Reset: Pre-populated demo dataset loaded.");
+    console.log("🔄 Demo Data Reset: Pre-populated demo dataset loaded.");
   }
 
   resetLiveShift() {
@@ -319,7 +319,7 @@ class ValetFlowApp {
     });
     this.saveState();
     this.renderAll();
-    alert("🚀 Live Shift Mode Activated: Clean shift initialized. All properties reset for real-time field operation.");
+    console.log("🚀 Live Shift Mode Activated: Clean shift initialized. All properties reset for real-time field operation.");
   }
 
   // NAV & VIEW SWITCHING
@@ -375,22 +375,16 @@ class ValetFlowApp {
 
     // LOG OUT BUTTON
     document.getElementById("btn-logout")?.addEventListener("click", () => {
-      if (confirm("Log out of ValetFlow Pro session?")) {
-        this.logout();
-      }
+      this.logout();
     });
 
     // LIVE SHIFT MODE RESET & DEMO RESET
     document.getElementById("btn-reset-demo")?.addEventListener("click", () => {
-      if (confirm("Reset all operational demo data to initial state?")) {
-        this.resetDemo();
-      }
+      this.resetDemo();
     });
 
     document.getElementById("btn-live-reset")?.addEventListener("click", () => {
-      if (confirm("Start clean Live Shift Mode? (Clears all current shift completion stats and violations for a fresh live field run)")) {
-        this.resetLiveShift();
-      }
+      this.resetLiveShift();
     });
 
     // Mobile Navigation Buttons

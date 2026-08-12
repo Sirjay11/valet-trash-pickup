@@ -164,11 +164,13 @@ const INITIAL_DATA = {
 class ValetFlowApp {
   constructor() {
     this.data = this.loadState();
+    this.currentUser = this.loadUserSession();
     this.activeBuildingId = "b2";
     this.activeUnitNumberForViolation = null;
     this.initViews();
     this.initEventListeners();
     this.initMapCanvas();
+    this.applyUserSession();
     this.renderAll();
   }
 
@@ -184,10 +186,137 @@ class ValetFlowApp {
     localStorage.setItem("valetflow_state", JSON.stringify(this.data));
   }
 
+  loadUserSession() {
+    const savedUser = localStorage.getItem("valetflow_user");
+    if (savedUser) {
+      try { return JSON.parse(savedUser); } catch (e) { console.error("Error loading user session", e); }
+    }
+    return null; // Null means not logged in -> show login screen
+  }
+
+  saveUserSession(user) {
+    this.currentUser = user;
+    if (user) {
+      localStorage.setItem("valetflow_user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("valetflow_user");
+    }
+  }
+
+  loginAsAdmin(email = "admin@valetflow.com") {
+    const user = {
+      role: "admin",
+      name: "James Doe",
+      title: "Operations Director",
+      avatar: "JD",
+      email: email
+    };
+    this.saveUserSession(user);
+    this.applyUserSession();
+    this.switchViewPanel("admin-view");
+  }
+
+  loginAsPorter(porterId = "porter-1") {
+    const porter = this.data.porters.find(p => p.id === porterId) || this.data.porters[0];
+    const initials = porter.name.split(' ').map(n => n[0]).join('');
+    const user = {
+      role: "porter",
+      name: porter.name,
+      title: `Field Porter (${porter.assignedPropertyName.split(' ')[0]})`,
+      avatar: initials,
+      porterId: porter.id,
+      assignedPropertyId: porter.assignedPropertyId
+    };
+    this.saveUserSession(user);
+    this.applyUserSession();
+    this.switchViewPanel("porter-view");
+  }
+
+  logout() {
+    this.saveUserSession(null);
+    this.applyUserSession();
+    this.switchViewPanel("login-view");
+  }
+
+  applyUserSession() {
+    const roleSwitcher = document.querySelector(".role-switcher");
+    const userProfile = document.getElementById("header-user-profile");
+    const logoutBtn = document.getElementById("btn-logout");
+    const userNameEl = document.getElementById("header-user-name");
+    const userRoleEl = document.getElementById("header-user-role");
+    const userAvatarEl = document.getElementById("header-user-avatar");
+
+    if (!this.currentUser) {
+      // Logged Out State -> Show Login Screen
+      if (roleSwitcher) roleSwitcher.style.display = "none";
+      if (userProfile) userProfile.style.display = "none";
+      if (logoutBtn) logoutBtn.style.display = "none";
+      this.switchViewPanel("login-view");
+    } else if (this.currentUser.role === "admin") {
+      // Admin Logged In -> Show All Hub Controls
+      if (roleSwitcher) roleSwitcher.style.display = "flex";
+      if (userProfile) userProfile.style.display = "flex";
+      if (logoutBtn) logoutBtn.style.display = "inline-flex";
+      if (userNameEl) userNameEl.textContent = this.currentUser.name;
+      if (userRoleEl) userRoleEl.textContent = this.currentUser.title;
+      if (userAvatarEl) userAvatarEl.textContent = this.currentUser.avatar;
+      this.switchViewPanel("admin-view");
+    } else if (this.currentUser.role === "porter") {
+      // Porter Logged In -> Dedicated Standalone Porter Mobile App
+      if (roleSwitcher) roleSwitcher.style.display = "none"; // Direct Mobile App view!
+      if (userProfile) userProfile.style.display = "flex";
+      if (logoutBtn) logoutBtn.style.display = "inline-flex";
+      if (userNameEl) userNameEl.textContent = this.currentUser.name;
+      if (userRoleEl) userRoleEl.textContent = this.currentUser.title;
+      if (userAvatarEl) userAvatarEl.textContent = this.currentUser.avatar;
+      this.switchViewPanel("porter-view");
+    }
+  }
+
+  switchViewPanel(viewId) {
+    document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
+    const target = document.getElementById(viewId);
+    if (target) target.classList.add("active");
+
+    const roleBtns = document.querySelectorAll(".role-btn");
+    roleBtns.forEach(btn => {
+      if (btn.getAttribute("data-view") === viewId) {
+        btn.classList.add("active");
+      } else {
+        btn.classList.remove("active");
+      }
+    });
+  }
+
   resetDemo() {
     this.data = JSON.parse(JSON.stringify(INITIAL_DATA));
     this.saveState();
     this.renderAll();
+    alert("🔄 Demo Data Reset: Pre-populated demo dataset loaded.");
+  }
+
+  resetLiveShift() {
+    // Clear all violations and reset shift progress for a real live field shift
+    this.data.violations = [];
+    this.data.buildings.forEach(b => {
+      b.completed = false;
+      b.servicedUnits = 0;
+      b.violationsCount = 0;
+    });
+    this.data.porters.forEach(p => {
+      p.unitsServiced = 0;
+      p.violationsLogged = 0;
+      p.progress = "0%";
+      p.status = "Active on Route";
+    });
+    this.data.activityLogs.unshift({
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      text: "🚀 LIVE SHIFT INITIALIZED: Clean operational dataset started for tonight's run.",
+      type: "system"
+    });
+    this.saveState();
+    this.renderAll();
+    alert("🚀 Live Shift Mode Activated: Clean shift initialized. All properties reset for real-time field operation.");
   }
 
   // NAV & VIEW SWITCHING
@@ -196,23 +325,68 @@ class ValetFlowApp {
     roleBtns.forEach(btn => {
       btn.addEventListener("click", () => {
         const targetViewId = btn.getAttribute("data-view");
-        roleBtns.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-
-        document.querySelectorAll(".view-panel").forEach(panel => {
-          panel.classList.remove("active");
-        });
-        const targetPanel = document.getElementById(targetViewId);
-        if (targetPanel) targetPanel.classList.add("active");
+        this.switchViewPanel(targetViewId);
       });
     });
   }
 
   initEventListeners() {
-    // Demo Reset
+    // AUTHENTICATION TAB SWITCHES ON LOGIN VIEW
+    document.getElementById("tab-btn-admin")?.addEventListener("click", () => {
+      document.getElementById("tab-btn-admin").classList.add("active");
+      document.getElementById("tab-btn-porter").classList.remove("active");
+      document.getElementById("form-admin-login").classList.add("active");
+      document.getElementById("form-porter-login").classList.remove("active");
+    });
+
+    document.getElementById("tab-btn-porter")?.addEventListener("click", () => {
+      document.getElementById("tab-btn-porter").classList.add("active");
+      document.getElementById("tab-btn-admin").classList.remove("active");
+      document.getElementById("form-porter-login").classList.add("active");
+      document.getElementById("form-admin-login").classList.remove("active");
+    });
+
+    // ADMIN LOGIN BUTTON CLICK
+    document.getElementById("btn-submit-admin-login")?.addEventListener("click", () => {
+      const email = document.getElementById("admin-email")?.value || "admin@valetflow.com";
+      this.loginAsAdmin(email);
+    });
+
+    // PORTER LOGIN BUTTON CLICK
+    document.getElementById("btn-submit-porter-login")?.addEventListener("click", () => {
+      const porterId = document.getElementById("porter-select-login")?.value || "porter-1";
+      this.loginAsPorter(porterId);
+    });
+
+    // AUTO-FILL DEMO BUTTONS
+    document.getElementById("btn-quick-fill-admin")?.addEventListener("click", () => {
+      document.getElementById("admin-email").value = "admin@valetflow.com";
+      document.getElementById("admin-password").value = "admin123";
+      this.loginAsAdmin("admin@valetflow.com");
+    });
+
+    document.getElementById("btn-quick-fill-porter")?.addEventListener("click", () => {
+      document.getElementById("porter-select-login").value = "porter-1";
+      this.loginAsPorter("porter-1");
+    });
+
+    // LOG OUT BUTTON
+    document.getElementById("btn-logout")?.addEventListener("click", () => {
+      if (confirm("Log out of ValetFlow Pro session?")) {
+        this.logout();
+      }
+    });
+
+    // LIVE SHIFT MODE RESET & DEMO RESET
     document.getElementById("btn-reset-demo")?.addEventListener("click", () => {
       if (confirm("Reset all operational demo data to initial state?")) {
         this.resetDemo();
+      }
+    });
+
+    document.getElementById("btn-live-reset")?.addEventListener("click", () => {
+      if (confirm("Start clean Live Shift Mode? (Clears all current shift completion stats and violations for a fresh live field run)")) {
+        this.resetLiveShift();
       }
     });
 

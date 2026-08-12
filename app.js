@@ -383,23 +383,25 @@ class ValetFlowApp {
 
     container.innerHTML = this.data.violations.map(v => `
       <div class="queue-item">
-        <img src="${v.photoUrl}" class="queue-img-thumb" alt="Violation">
-        <div class="queue-info">
-          <div class="queue-title">
-            <span class="queue-unit">Unit ${v.unitNumber}</span>
-            <span>$${v.fineAmount} Fine</span>
+        <div class="queue-item-header">
+          <img src="${v.photoUrl}" class="queue-img-thumb" alt="Violation">
+          <div class="queue-info">
+            <div class="queue-title">
+              <span class="queue-unit">Unit ${v.unitNumber}</span>
+              <span class="queue-fine-tag">$${v.fineAmount} Fine</span>
+            </div>
+            <div class="queue-meta">
+              ${v.propertyName} • ${v.category} • ${v.timestamp}
+            </div>
+            <div class="queue-note">"${v.note}"</div>
           </div>
-          <div class="queue-meta">
-            ${v.propertyName} • ${v.category} • ${v.timestamp}
-          </div>
-          <div style="font-size:10px; color:#94a3b8; margin-top:2px;">"${v.note}"</div>
         </div>
         <div class="queue-actions">
           <button class="btn-primary btn-sm" onclick="app.approveViolation('${v.id}')" title="Approve Notice">
-            <i data-lucide="check"></i>
+            <i data-lucide="check"></i> Approve
           </button>
           <button class="btn-secondary btn-sm" onclick="app.dismissViolation('${v.id}')" title="Dismiss">
-            <i data-lucide="x"></i>
+            <i data-lucide="x"></i> Dismiss
           </button>
         </div>
       </div>

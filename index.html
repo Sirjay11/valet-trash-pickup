@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ValetFlow Pro | Valet Trash Operations Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="dark-theme">
+
+  <!-- TOP GLOBAL HEADER -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="brand-logo">
+        <div class="logo-icon">
+          <i data-lucide="trash-2"></i>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">ValetFlow <span class="badge-pro">PRO</span></span>
+          <span class="brand-tagline">Valet Trash Operations OS</span>
+        </div>
+      </div>
+      <div class="live-status-pill">
+        <span class="pulse-dot"></span>
+        <span class="status-text">LIVE NIGHT SHIFT IN PROGRESS</span>
+      </div>
+    </div>
+
+    <!-- ROLE VIEW SWITCHER -->
+    <nav class="role-switcher">
+      <button class="role-btn active" data-view="admin-view">
+        <i data-lucide="layout-dashboard"></i>
+        <span>Admin Ops Hub</span>
+      </button>
+      <button class="role-btn" data-view="porter-view">
+        <i data-lucide="smartphone"></i>
+        <span>Porter Mobile App</span>
+        <span class="nav-badge" id="porter-pending-badge">3</span>
+      </button>
+      <button class="role-btn" data-view="client-view">
+        <i data-lucide="building-2"></i>
+        <span>Property Mgr Portal</span>
+      </button>
+      <button class="role-btn" data-view="report-view">
+        <i data-lucide="file-text"></i>
+        <span>Nightly Summary</span>
+      </button>
+    </nav>
+
+    <div class="header-right">
+      <button class="btn-secondary" id="btn-reset-demo" title="Reset Demo Data">
+        <i data-lucide="rotate-ccw"></i> Reset Demo
+      </button>
+      <div class="user-profile">
+        <div class="avatar">JD</div>
+        <div class="user-info">
+          <span class="user-name">James Doe</span>
+          <span class="user-role">Operations Director</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="app-container">
+
+    <!-- ========================================== -->
+    <!-- 1. ADMIN OPERATIONS HUB VIEW -->
+    <!-- ========================================== -->
+    <section id="admin-view" class="view-panel active">
+      <!-- STAT CARDS -->
+      <div class="stats-grid">
+        <div class="stat-card border-green">
+          <div class="stat-icon bg-green-light">
+            <i data-lucide="shield-check"></i>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Service Compliance Rate</span>
+            <div class="stat-value-group">
+              <span class="stat-number" id="compliance-rate">97.8%</span>
+              <span class="stat-trend positive"><i data-lucide="trending-up"></i> +1.4%</span>
+            </div>
+            <span class="stat-subtext">Target threshold: 95.0%</span>
+          </div>
+        </div>
+
+        <div class="stat-card border-blue">
+          <div class="stat-icon bg-blue-light">
+            <i data-lucide="users"></i>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Active Porters on Route</span>
+            <div class="stat-value-group">
+              <span class="stat-number" id="active-porters-count">3 / 3</span>
+              <span class="status-chip chip-online">All On-Time</span>
+            </div>
+            <span class="stat-subtext">3 routes active tonight</span>
+          </div>
+        </div>
+
+        <div class="stat-card border-purple">
+          <div class="stat-icon bg-purple-light">
+            <i data-lucide="check-circle-2"></i>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Units Serviced Tonight</span>
+            <div class="stat-value-group">
+              <span class="stat-number" id="units-serviced-count">342 / 420</span>
+              <span class="stat-percentage" id="units-serviced-pct">81.4%</span>
+            </div>
+            <div class="progress-bar-sm">
+              <div class="progress-fill" id="units-progress-bar" style="width: 81.4%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card border-red">
+          <div class="stat-icon bg-red-light">
+            <i data-lucide="alert-triangle"></i>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Violations Logged</span>
+            <div class="stat-value-group">
+              <span class="stat-number" id="admin-violation-count">6</span>
+              <span class="status-chip chip-urgent">$150 Revenue</span>
+            </div>
+            <span class="stat-subtext">Instant photo proof attached</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN ADMIN GRID CONTENT -->
+      <div class="dashboard-grid">
+
+        <!-- LEFT COLUMN: LIVE MAP & ROUTES -->
+        <div class="grid-col-left">
+          
+          <!-- LIVE FLEET TRACKING MAP -->
+          <div class="glass-card map-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i data-lucide="map-pin"></i> Live Geofence Fleet Map
+              </div>
+              <div class="map-controls">
+                <span class="map-live-tag"><span class="pulse-green"></span> Realtime GPS</span>
+                <select id="map-property-filter" class="select-sm">
+                  <option value="all">All Properties (3)</option>
+                  <option value="p1">Oakridge Luxury Apartments</option>
+                  <option value="p2">The Grand Reserve</option>
+                  <option value="p3">Sunburst Ridge</option>
+                </select>
+              </div>
+            </div>
+            <div class="map-canvas-container">
+              <canvas id="fleet-map-canvas"></canvas>
+              <div class="map-overlay-legend">
+                <span class="legend-item"><span class="dot dot-green"></span> Active Porter</span>
+                <span class="legend-item"><span class="dot dot-blue"></span> Serviced Building</span>
+                <span class="legend-item"><span class="dot dot-amber"></span> In-Progress</span>
+                <span class="legend-item"><span class="dot dot-red"></span> Dumpster / Alert</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ACTIVE ROUTES DISPATCH TABLE -->
+          <div class="glass-card table-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i data-lucide="truck"></i> Active Night Shift Routes & Dispatch
+              </div>
+              <button class="btn-sm btn-primary" id="btn-dispatch-route">
+                <i data-lucide="plus"></i> Dispatch Route
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Porter / Driver</th>
+                    <th>Property Assigned</th>
+                    <th>Progress</th>
+                    <th>Clock-In</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="routes-table-body">
+                  <!-- JS Dynamic Insertion -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: VIOLATION QUEUE & PROPERTY DIRECTORY -->
+        <div class="grid-col-right">
+
+          <!-- VIOLATIONS APPROVAL QUEUE -->
+          <div class="glass-card queue-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i data-lucide="camera"></i> Doorstep Violation Queue
+              </div>
+              <span class="badge badge-amber" id="queue-count-badge">4 Pending Review</span>
+            </div>
+            <div class="violation-queue-list" id="admin-violation-queue">
+              <!-- JS Dynamic Insertion -->
+            </div>
+          </div>
+
+          <!-- PROPERTY PORTFOLIO STATS -->
+          <div class="glass-card properties-summary-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i data-lucide="building"></i> Active Property Contracts
+              </div>
+            </div>
+            <div class="property-list-compact" id="property-summary-list">
+              <!-- JS Dynamic Insertion -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ========================================== -->
+    <!-- 2. PORTER FIELD MOBILE APP VIEW -->
+    <!-- ========================================== -->
+    <section id="porter-view" class="view-panel">
+      <div class="mobile-simulator-wrapper">
+        <div class="mobile-device-frame">
+          
+          <!-- MOBILE HEADER -->
+          <div class="mobile-header">
+            <div class="mobile-status-bar">
+              <span>9:41 PM</span>
+              <div class="mobile-icons">
+                <i data-lucide="wifi"></i>
+                <i data-lucide="battery"></i>
+              </div>
+            </div>
+            <div class="mobile-app-bar">
+              <div class="mobile-user-tag">
+                <i data-lucide="user-check"></i>
+                <div>
+                  <div class="m-user-name">Marcus Vance</div>
+                  <div class="m-route-name">Oakridge Luxury Apartments</div>
+                </div>
+              </div>
+              <button class="m-icon-btn" id="m-btn-dumpster-alert" title="Report Facility Issue">
+                <i data-lucide="alert-octagon"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- MOBILE CONTENT BODY -->
+          <div class="mobile-body">
+            
+            <!-- STEP 1: PROPERTY & SHIFT START -->
+            <div id="m-step-shift-start" class="m-screen active">
+              <div class="m-card hero-card">
+                <img src="assets/property_hero.png" alt="Property Hero" class="m-hero-img">
+                <div class="m-hero-overlay">
+                  <span class="m-badge-live">Geofenced Location Verified</span>
+                  <h2>Oakridge Luxury Apartments</h2>
+                  <p>180 Doorsteps • 6 Buildings • Sun-Thu 8PM Service</p>
+                </div>
+              </div>
+
+              <div class="m-shift-status-box">
+                <div class="m-status-row">
+                  <span>Shift Status:</span>
+                  <span class="m-status-active">IN PROGRESS</span>
+                </div>
+                <div class="m-timer" id="shift-clock-timer">01:42:15</div>
+                <p class="m-sub">Clocked in at 8:00 PM via GPS</p>
+              </div>
+
+              <div class="m-building-selector-header">
+                <h3>Select Building Walkthrough</h3>
+                <span class="m-count-tag" id="buildings-completed-tag">4/6 Complete</span>
+              </div>
+
+              <div class="m-building-grid" id="m-building-grid-list">
+                <!-- JS Dynamic Insertion -->
+              </div>
+            </div>
+
+            <!-- STEP 2: UNIT WALKTHROUGH CHECKLIST -->
+            <div id="m-step-unit-checklist" class="m-screen">
+              <div class="m-top-nav">
+                <button class="m-back-btn" id="m-btn-back-buildings">
+                  <i data-lucide="chevron-left"></i> Buildings
+                </button>
+                <div class="m-nav-title">
+                  <span id="m-active-bldg-name">Building 2 (Floor 2 & 3)</span>
+                </div>
+                <div class="m-nav-right-count" id="m-bldg-unit-progress">0/10</div>
+              </div>
+
+              <div class="m-unit-instruction-banner">
+                <i data-lucide="info"></i> Tap <b>Serviced</b> for collected bags, or <b>Violation</b> for non-compliant doors.
+              </div>
+
+              <div class="m-unit-list" id="m-unit-list-container">
+                <!-- JS Dynamic Insertion -->
+              </div>
+
+              <div class="m-sticky-footer">
+                <button class="m-btn-complete-bldg" id="m-btn-complete-bldg">
+                  <i data-lucide="check-check"></i> Complete Building Walkthrough
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- MOBILE BOTTOM NAV -->
+          <div class="mobile-bottom-nav">
+            <button class="m-nav-item active" id="m-nav-route">
+              <i data-lucide="map"></i>
+              <span>Route</span>
+            </button>
+            <button class="m-nav-item" id="m-nav-violations">
+              <i data-lucide="camera"></i>
+              <span>Log Violation</span>
+            </button>
+            <button class="m-nav-item" id="m-nav-summary">
+              <i data-lucide="bar-chart-3"></i>
+              <span>Shift Log</span>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- SIMULATOR CONTROL HELPER -->
+        <div class="simulator-instructions">
+          <h4>📱 Interactive Porter App Instructions</h4>
+          <ul>
+            <li>Select a building (e.g. <b>Building 2</b>) to start doorstep walk.</li>
+            <li>Tap <span class="text-green">Serviced</span> or <span class="text-red">Violation</span> on units.</li>
+            <li>Test logging a violation with photo simulation & fine preview.</li>
+            <li>Updates sync in real-time to the <b>Admin Hub</b> and <b>Client Portal</b>!</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ========================================== -->
+    <!-- 3. PROPERTY MANAGER PORTAL VIEW -->
+    <!-- ========================================== -->
+    <section id="client-view" class="view-panel">
+      
+      <!-- PROPERTY MANAGER HEADER BANNER -->
+      <div class="glass-card client-banner">
+        <div class="client-banner-left">
+          <div class="client-property-badge">
+            <i data-lucide="building"></i>
+          </div>
+          <div>
+            <h2 id="client-prop-title">Oakridge Luxury Apartments</h2>
+            <p>Property Manager Portal • 180 Total Doorstep Units • Contract Active</p>
+          </div>
+        </div>
+        <div class="client-banner-right">
+          <select id="client-prop-selector" class="select-md">
+            <option value="p1">Oakridge Luxury Apartments</option>
+            <option value="p2">The Grand Reserve</option>
+            <option value="p3">Sunburst Ridge</option>
+          </select>
+          <button class="btn-primary" id="btn-client-export-report">
+            <i data-lucide="download"></i> Download Nightly Report
+          </button>
+        </div>
+      </div>
+
+      <!-- CLIENT METRICS -->
+      <div class="stats-grid">
+        <div class="stat-card border-green">
+          <div class="stat-icon bg-green-light"><i data-lucide="check-circle-2"></i></div>
+          <div class="stat-content">
+            <span class="stat-label">Tonight's Service Rate</span>
+            <div class="stat-value-group">
+              <span class="stat-number" id="client-service-rate">98.3%</span>
+              <span class="status-chip chip-online">On Schedule</span>
+            </div>
+            <span class="stat-subtext">177 of 180 units completed</span>
+          </div>
+        </div>
+
+        <div class="stat-card border-amber">
+          <div class="stat-icon bg-amber-light"><i data-lucide="alert-circle"></i></div>
+          <div class="stat-content">
+            <span class="stat-label">Tenant Violations Logged</span>
+            <div class="stat-value-group">
+              <span class="stat-number" id="client-violation-count">3</span>
+              <span class="status-chip chip-urgent">$75 Fine Value</span>
+            </div>
+            <span class="stat-subtext">Photo proof ready for lease notices</span>
+          </div>
+        </div>
+
+        <div class="stat-card border-blue">
+          <div class="stat-icon bg-blue-light"><i data-lucide="clock"></i></div>
+          <div class="stat-content">
+            <span class="stat-label">Porter Check-in / Out</span>
+            <div class="stat-value-group">
+              <span class="stat-number">8:02 PM</span>
+              <span class="stat-subtext">In-Progress (Bldg 5)</span>
+            </div>
+            <span class="stat-subtext">Valet: Marcus Vance</span>
+          </div>
+        </div>
+
+        <div class="stat-card border-purple">
+          <div class="stat-icon bg-purple-light"><i data-lucide="trash"></i></div>
+          <div class="stat-content">
+            <span class="stat-label">Compactor Status</span>
+            <div class="stat-value-group">
+              <span class="stat-number">Normal</span>
+              <span class="status-chip chip-online">65% Full</span>
+            </div>
+            <span class="stat-subtext">No overflow alerts</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLIENT GRID -->
+      <div class="dashboard-grid">
+        
+        <!-- VIOLATION REPORT CARDS WITH PHOTO PROOF -->
+        <div class="grid-col-left">
+          <div class="glass-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i data-lucide="file-warning"></i> Recent Resident Violation Cards (Ready for Lease Fine)
+              </div>
+            </div>
+            <div class="client-violation-grid" id="client-violation-cards">
+              <!-- JS Dynamic Insertion -->
+            </div>
+          </div>
+        </div>
+
+        <!-- BULK PICKUP REQUEST & SERVICE LOGS -->
+        <div class="grid-col-right">
+          
+          <!-- SUBMIT BULK PICKUP REQUEST -->
+          <div class="glass-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i data-lucide="package-plus"></i> Request Bulk Item Removal
+              </div>
+            </div>
+            <form id="form-bulk-request" class="bulk-form">
+              <div class="form-group">
+                <label>Unit # / Location</label>
+                <input type="text" id="bulk-unit" placeholder="e.g. Unit 304 or Dumpster area" required>
+              </div>
+              <div class="form-group">
+                <label>Item Description</label>
+                <select id="bulk-item-type" required>
+                  <option value="Furniture / Couch">Furniture / Couch</option>
+                  <option value="Mattress / Box Spring">Mattress / Box Spring</option>
+                  <option value="Appliance / Electronics">Appliance / Electronics</option>
+                  <option value="Excessive Move-out Boxes">Excessive Move-out Boxes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Notes for Valet Porter</label>
+                <textarea id="bulk-notes" rows="2" placeholder="Item left by breezeway stairs..."></textarea>
+              </div>
+              <button type="submit" class="btn-primary btn-block">
+                <i data-lucide="send"></i> Submit Bulk Pick Request ($35)
+              </button>
+            </form>
+          </div>
+
+          <!-- SERVICE TIMELINE -->
+          <div class="glass-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i data-lucide="history"></i> Nightly Activity Log
+              </div>
+            </div>
+            <div class="timeline-list" id="client-timeline">
+              <!-- JS Dynamic Insertion -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ========================================== -->
+    <!-- 4. NIGHTLY SUMMARY REPORT PREVIEW -->
+    <!-- ========================================== -->
+    <section id="report-view" class="view-panel">
+      <div class="report-wrapper">
+        
+        <div class="report-actions">
+          <h3><i data-lucide="file-check-2"></i> Automated Nightly Service Report Preview</h3>
+          <button class="btn-primary" onclick="window.print()">
+            <i data-lucide="printer"></i> Print / Save PDF
+          </button>
+        </div>
+
+        <div class="report-paper-document">
+          <div class="report-doc-header">
+            <div class="report-doc-brand">
+              <h1>VALETFLOW PRO</h1>
+              <p>Official Proof of Service & Operations Log</p>
+            </div>
+            <div class="report-doc-meta">
+              <div><strong>Date:</strong> <span id="report-date-str">August 12, 2026</span></div>
+              <div><strong>Shift:</strong> Night Service (8:00 PM - 11:00 PM)</div>
+              <div><strong>Property:</strong> Oakridge Luxury Apartments</div>
+            </div>
+          </div>
+
+          <hr class="report-divider">
+
+          <div class="report-summary-boxes">
+            <div class="report-summary-box">
+              <span class="box-title">Total Units Serviced</span>
+              <span class="box-value text-green" id="report-units-val">177 / 180 (98.3%)</span>
+            </div>
+            <div class="report-summary-box">
+              <span class="box-title">Violations Logged</span>
+              <span class="box-value text-red" id="report-violations-val">3 Units</span>
+            </div>
+            <div class="report-summary-box">
+              <span class="box-title">Porter Check-in</span>
+              <span class="box-value">8:02 PM GPS Verified</span>
+            </div>
+            <div class="report-summary-box">
+              <span class="box-title">Compactor Condition</span>
+              <span class="box-value">Operational / Clean</span>
+            </div>
+          </div>
+
+          <h3 class="report-section-title">1. Violations & Lease Non-Compliance Log</h3>
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Unit #</th>
+                <th>Violation Category</th>
+                <th>Timestamp</th>
+                <th>Evidence Photo</th>
+                <th>Standard Fine</th>
+              </tr>
+            </thead>
+            <tbody id="report-violations-table">
+              <!-- Dynamic JS Insertion -->
+            </tbody>
+          </table>
+
+          <h3 class="report-section-title">2. Building Service Progression Breakdown</h3>
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Building #</th>
+                <th>Total Units</th>
+                <th>Serviced</th>
+                <th>Violations</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="report-buildings-table">
+              <!-- Dynamic JS Insertion -->
+            </tbody>
+          </table>
+
+          <div class="report-footer">
+            <p>Report generated automatically by ValetFlow OS at 11:05 PM EST. Sent to Property Management contact at leasing@oakridgeapts.com.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- ========================================== -->
+  <!-- MODALS -->
+  <!-- ========================================== -->
+
+  <!-- VIOLATION CAMERA SIMULATOR MODAL -->
+  <div id="modal-violation-camera" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i data-lucide="camera"></i> Log Doorstep Violation (Unit <span id="modal-violation-unit">204</span>)
+        </div>
+        <button class="modal-close" id="btn-close-violation-modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="camera-preview-box">
+          <img src="assets/violation_sample.png" alt="Violation Sample" class="camera-img-preview" id="violation-photo-preview">
+          <div class="camera-badge-tag"><i data-lucide="map-pin"></i> GPS Locked • 204 Doorstep</div>
+        </div>
+
+        <div class="form-group">
+          <label>Violation Type Category</label>
+          <select id="modal-violation-type" class="select-md">
+            <option value="Unbagged / Loose Trash">Unbagged / Loose Trash ($25 fine)</option>
+            <option value="Unapproved Container">Unapproved Container ($25 fine)</option>
+            <option value="Excessive Weight (>25 lbs)">Excessive Weight (>25 lbs) ($50 fine)</option>
+            <option value="Hazardous / Bio-Waste">Hazardous / Bio-Waste ($100 fine)</option>
+            <option value="Early Trash Put-Out">Early Trash Put-Out ($25 fine)</option>
+            <option value="Damaged Bin">Damaged Bin ($35 replacement fee)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Porter Note / Description</label>
+          <input type="text" id="modal-violation-note" placeholder="Loose bags resting next to non-valet container..." value="Loose unbagged trash left next to doorstep without approved valet container.">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" id="btn-cancel-violation">Cancel</button>
+        <button class="btn-primary btn-red" id="btn-submit-violation">
+          <i data-lucide="alert-triangle"></i> Log Violation with Photo Proof
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DISPATCH NEW ROUTE MODAL -->
+  <div id="modal-dispatch-route" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i data-lucide="user-plus"></i> Dispatch Night Shift Route
+        </div>
+        <button class="modal-close" id="btn-close-dispatch-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Select Valet Porter</label>
+          <select id="dispatch-porter-select">
+            <option value="Marcus Vance">Marcus Vance</option>
+            <option value="Sarah Jenkins">Sarah Jenkins</option>
+            <option value="Devon Carter">Devon Carter</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Assign Apartment Community</label>
+          <select id="dispatch-property-select">
+            <option value="p1">Oakridge Luxury Apartments (180 Units)</option>
+            <option value="p2">The Grand Reserve (140 Units)</option>
+            <option value="p3">Sunburst Ridge (100 Units)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Shift Time</label>
+          <input type="text" value="8:00 PM - 11:00 PM" disabled>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" id="btn-cancel-dispatch">Cancel</button>
+        <button class="btn-primary" id="btn-confirm-dispatch">
+          <i data-lucide="send"></i> Dispatch Route
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- MAIN APP SCRIPT -->
+  <script src="app.js"></script>
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+  </script>
+</body>
+</html>

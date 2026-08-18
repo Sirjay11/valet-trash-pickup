@@ -1,0 +1,14 @@
+{
+  "name": "ValetFlow Service Operations",
+  "short_name": "ValetFlow",
+  "description": "Mobile service workflow and proof-of-service operations tool.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#090d16",
+  "theme_color": "#090d16",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "assets/valetflow-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
